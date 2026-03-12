@@ -1,70 +1,82 @@
-# RevoCore Bot
+# RevoCore Bot (Java Edition)
 
-بوت ديسكورد متكامل لتنظيم السيرفر مع نظام ترحيب + مستويات + لوغ احترافي مقسّم.
+تم تحويل البوت بالكامل إلى **Java + JDA** مع نظام أقوى وأذكى.
 
-## أهم المميزات
+## التحسينات الجديدة
 
-- ✅ **أوامر عامة بـ `!`** (مثل `!rank` و `!top`).
-- ✅ **أوامر الإدارة بـ `/`** (Slash Commands) مع صلاحية Administrator.
-- ✅ نظام ترحيب عربي تلقائي.
-- ✅ نظام مستويات XP بتدرّج 15٪ لكل مستوى + Anti-Spam cooldown.
-- ✅ رتب تلقائية كل 10 مستويات (`Level 10`, `Level 20`, ...).
-- ✅ نظام لوغ متقدّم بقنوات منفصلة مثل:
-  - `لوق-الرسائل`
+- أوامر عامة للأعضاء بـ `!`:
+  - `!rank`
+  - `!top`
+- أوامر إدارة بـ `/` (Admins فقط):
+  - `/setup_logs`
+  - `/set_welcome`
+  - `/set_log_channel`
+  - `/send_test_log`
+  - `/config`
+- نظام XP احترافي مع:
+  - Anti-Spam cooldown
+  - نمو صعوبة المستوى (`LEVEL_GROWTH`)
+  - رتب تلقائية كل 10 مستويات
+- نظام Logs متقدم ومقسّم تلقائيًا:
   - `لوق-عام`
+  - `لوق-الرسائل`
+  - `لوق-الدخول-الخروج`
   - `لوق-الرتب`
   - `لوق-الرومات`
   - `لوق-الفويسات`
   - `لوق-الاسماء`
+  - `لوق-اوتو-مود`
+- AutoMod ذكي:
+  - حظر روابط الدعوات (اختياري)
+  - منع Mention Spam
+- قاعدة بيانات SQLite لحفظ التقدم والإعدادات.
+
+## المكتبات المستخدمة
+
+- **JDA**: ربط Discord API
+- **sqlite-jdbc**: قاعدة البيانات
+- **slf4j-simple**: تسجيل السجلات
+- **maven-shade-plugin**: بناء Jar جاهز للتشغيل
 
 ## المتطلبات
 
-- Python 3.11+
-- Bot Token من Discord Developer Portal
-- تفعيل Privileged Intents للبوت:
-  - Members Intent
-  - Message Content Intent
+- Java 17+
+- Maven 3.9+
 
 ## التشغيل
 
-1. تثبيت المكتبات:
-
-```bash
-pip install -r requirements.txt
-```
-
-2. نسخ ملف البيئة:
-
+1) انسخ ملف الإعدادات:
 ```bash
 cp .env.example .env
 ```
 
-3. تعديل القيم في `.env`.
-
-4. تشغيل البوت:
-
+2) صدّر المتغيرات من `.env` (لينكس):
 ```bash
-python bot.py
+set -a && source .env && set +a
 ```
 
-## أوامر المستخدمين (Prefix)
+3) ابنِ المشروع:
+```bash
+mvn -q -DskipTests package
+```
 
-- `!rank` → يعرض مستواك الحالي وXP.
-- `!top` → يعرض ترتيب أعلى 10 أعضاء.
+4) شغّل البوت:
+```bash
+java -jar target/revocore-bot-1.0.0.jar
+```
 
-## أوامر الإدارة (Slash)
+## هيكل المشروع
 
-- `/setup_logs` → إنشاء وتجهيز قنوات اللوغ تلقائيًا تحت تصنيف `LOGS`.
-- `/set_welcome` → تحديد روم الترحيب.
-- `/set_log_channel` → تحديد روم مخصص لأي نوع لوغ.
-- `/send_test_log` → إرسال رسالة اختبار لنظام اللوغ.
+- `pom.xml` إعداد Maven وكل المكتبات
+- `src/main/java/com/revocore/bot/Main.java` نقطة تشغيل البوت
+- `src/main/java/com/revocore/bot/BotConfig.java` تحميل الإعدادات من البيئة
+- `src/main/java/com/revocore/bot/Database.java` طبقة SQLite
+- `src/main/java/com/revocore/bot/LogService.java` إدارة اللوغ والقنوات
+- `src/main/java/com/revocore/bot/BotListener.java` الأحداث + الأوامر + XP + AutoMod
 
-## الإعدادات (.env)
+## ملاحظات مهمة
 
-- `DISCORD_TOKEN`: توكن البوت (إلزامي).
-- `WELCOME_CHANNEL_ID`: آيدي روم الترحيب.
-- `LOGS_CATEGORY_NAME`: اسم تصنيف قنوات اللوغ.
-- `XP_PER_MESSAGE`: XP لكل رسالة.
-- `XP_COOLDOWN_SECONDS`: كولداون XP لمنع السبام.
-- `BASE_LEVEL_XP`: XP المطلوب للمستوى الأول.
-- `LEVEL_GROWTH`: نسبة نمو صعوبة كل مستوى (الافتراضي 1.15).
+- لازم تفعل intents من Discord Developer Portal:
+  - Server Members Intent
+  - Message Content Intent
+- أول ما تشغل البوت استخدم `/setup_logs` عشان يبني قنوات اللوغ تلقائيًا.
