@@ -1,23 +1,24 @@
-# RevoCore Bot (Java Edition)
+# RevoCore Bot (Python)
 
-تم تحويل البوت بالكامل إلى **Java + JDA** مع نظام أقوى وأذكى.
+تم تطوير البوت ليكون بنظام لوق احترافي قريب من ProBot لكن مع إضافات أقوى.
 
-## التحسينات الجديدة
+## الميزات الأساسية
 
-- أوامر عامة للأعضاء بـ `!`:
+- أوامر عامة للأعضاء بـ `!` وتعمل فقط داخل روم الأوامر المحدد (`COMMANDS_CHANNEL_ID`).
   - `!rank`
   - `!top`
-- أوامر إدارة بـ `/` (Admins فقط):
+- أوامر إدارة Slash بـ `/` من أي مكان لكن يجب أن يكون المستخدم Administrator:
   - `/setup_logs`
   - `/set_welcome`
   - `/set_log_channel`
+  - `/logs_status`
+  - `/warn`
+  - `/mute`
   - `/send_test_log`
-  - `/config`
-- نظام XP احترافي مع:
-  - Anti-Spam cooldown
-  - نمو صعوبة المستوى (`LEVEL_GROWTH`)
-  - رتب تلقائية كل 10 مستويات
-- نظام Logs متقدم ومقسّم تلقائيًا:
+
+## نظام اللوق (Pro-style + أقوى)
+
+- لوق مقسّم تلقائيًا إلى قنوات متخصصة:
   - `لوق-عام`
   - `لوق-الرسائل`
   - `لوق-الدخول-الخروج`
@@ -26,57 +27,64 @@
   - `لوق-الفويسات`
   - `لوق-الاسماء`
   - `لوق-اوتو-مود`
-- AutoMod ذكي:
-  - حظر روابط الدعوات (اختياري)
-  - منع Mention Spam
-- قاعدة بيانات SQLite لحفظ التقدم والإعدادات.
+  - `لوق-الادارة`
+  - `لوق-اللفل`
+- كل لوق يعرض Embed احترافي مع:
+  - المستهدف
+  - المنفذ (عبر Audit Log إن توفر)
+  - السبب
+  - الروم
+  - تفاصيل قبل/بعد
+  - توقيت الحدث + Footer
+- يغطي الأحداث التالية:
+  - حذف/تعديل الرسائل
+  - دخول/خروج الأعضاء
+  - تغيير الأسماء
+  - تحديث الرتب للأعضاء
+  - إنشاء/حذف/تعديل الرومات
+  - إنشاء/حذف/تعديل الرتب
+  - دخول/خروج/انتقال الفويس
+  - أحداث الإدارة والتحذيرات والميوت
 
-## المكتبات المستخدمة
+## AutoMod الذكي
 
-- **JDA**: ربط Discord API
-- **sqlite-jdbc**: قاعدة البيانات
-- **slf4j-simple**: تسجيل السجلات
-- **maven-shade-plugin**: بناء Jar جاهز للتشغيل
+- حظر روابط الدعوات
+- منع Mention Spam
+- منع الرسائل المكررة بسرعة
+- منع الكابس المبالغ فيه
 
-## المتطلبات
+## نظام اللفل
 
-- Java 17+
-- Maven 3.9+
+- XP لكل رسالة
+- Anti-Spam cooldown
+- صعوبة تصاعدية (`LEVEL_GROWTH`)
+- رتب تلقائية كل 10 مستويات
 
 ## التشغيل
 
-1) انسخ ملف الإعدادات:
 ```bash
+pip install -r requirements.txt
 cp .env.example .env
+# عدّل القيم في .env
+python bot.py
 ```
 
-2) صدّر المتغيرات من `.env` (لينكس):
-```bash
-set -a && source .env && set +a
-```
+### إعدادات مهمة في `.env`
+- `COMMANDS_CHANNEL_ID`: روم الأوامر العامة (`!rank`, `!top`)
+- `WELCOME_CHANNEL_ID`: روم الترحيب
+- `LOGS_CATEGORY_NAME`: اسم تصنيف قنوات اللوق
 
-3) ابنِ المشروع:
-```bash
-mvn -q -DskipTests package
-```
+## الإعداد بعد التشغيل
 
-4) شغّل البوت:
-```bash
-java -jar target/revocore-bot-1.0.0.jar
-```
+1. نفذ `/setup_logs` لتجهيز كل قنوات اللوغ تلقائيًا.
+2. استخدم `/set_welcome` لتحديد روم الترحيب.
+3. استخدم `/logs_status` للتأكد من كل ربط القنوات.
+4. اضبط `COMMANDS_CHANNEL_ID` ليكون روم الأوامر العامة (حالياً: `1468825356487098430`).
 
-## هيكل المشروع
+## المتطلبات
 
-- `pom.xml` إعداد Maven وكل المكتبات
-- `src/main/java/com/revocore/bot/Main.java` نقطة تشغيل البوت
-- `src/main/java/com/revocore/bot/BotConfig.java` تحميل الإعدادات من البيئة
-- `src/main/java/com/revocore/bot/Database.java` طبقة SQLite
-- `src/main/java/com/revocore/bot/LogService.java` إدارة اللوغ والقنوات
-- `src/main/java/com/revocore/bot/BotListener.java` الأحداث + الأوامر + XP + AutoMod
-
-## ملاحظات مهمة
-
-- لازم تفعل intents من Discord Developer Portal:
+- Python 3.11+
+- تفعيل Intents من Discord Developer Portal:
   - Server Members Intent
   - Message Content Intent
-- أول ما تشغل البوت استخدم `/setup_logs` عشان يبني قنوات اللوغ تلقائيًا.
+  - (مستحسن) صلاحية View Audit Log للبوت للحصول على منفذ الحدث في اللوغ
